@@ -22,4 +22,4 @@ terragrunt = {
 aws_region = "eu-west-2"
 environment = "dale"
 iam_role = "arn:aws:iam::327778747031:role/codebuild"
-github_token_name = "/NHS/dev-327778747031/tf/github-token"
+github_token_name = "/NHS/dale-327778747031/tf/github_token"

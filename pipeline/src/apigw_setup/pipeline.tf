@@ -1,5 +1,5 @@
 resource "aws_s3_bucket" "artifacts" {
-  bucket = "prm-${data.aws_caller_identity.current.account_id}-apigw-pipeline-artifacts-${var.environment}"
+  bucket = "prm-${data.aws_caller_identity.current.account_id}-apigw-setup-pipeline-artifacts-${var.environment}"
   acl    = "private"
 }
 
@@ -17,7 +17,7 @@ data "aws_iam_policy_document" "codepipeline_assume" {
 }
 
 resource "aws_iam_role" "pipeline_role" {
-  name               = "apigw-pipeline-${var.environment}"
+  name               = "prm-apigw-setup-pipeline-${var.environment}"
   assume_role_policy = "${data.aws_iam_policy_document.codepipeline_assume.json}"
 }
 
@@ -55,8 +55,6 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
     ]
 
     resources = [
-      "${aws_codebuild_project.test.arn}",
-      "${aws_codebuild_project.build.arn}",
       "${aws_codebuild_project.terratest.arn}",
       "${aws_codebuild_project.deploy.arn}",
     ]
@@ -64,7 +62,7 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
 }
 
 resource "aws_iam_role_policy" "pipeline_role_policy" {
-  name   = "apigw-pipeline"
+  name   = "prm-apigw-setup-pipeline"
   role   = "${aws_iam_role.pipeline_role.id}"
   policy = "${data.aws_iam_policy_document.pipeline_role_policy.json}"
 }
@@ -75,7 +73,7 @@ data "aws_ssm_parameter" "github_token" {
 }
 
 resource "aws_codepipeline" "pipeline" {
-  name     = "prm-apigw-${var.environment}"
+  name     = "prm-apigw-setup-${var.environment}"
   role_arn = "${aws_iam_role.pipeline_role.arn}"
 
   artifact_store {
@@ -95,9 +93,9 @@ resource "aws_codepipeline" "pipeline" {
       output_artifacts = ["source"]
 
       configuration {
-        Owner      = "nhsconnect"
-        Repo       = "prm-migrator"
-        Branch     = "prm-apigw"
+        Owner      = "subnova-nhs"
+        Repo       = "prm-apigw-setup"
+        Branch     = "master"
         OAuthToken = "${data.aws_ssm_parameter.github_token.value}"
       }
     }

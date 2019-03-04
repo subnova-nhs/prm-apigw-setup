@@ -1,5 +1,5 @@
 resource "aws_codebuild_project" "deploy" {
-  name        = "prm-apigw-deploy-${var.environment}"
+  name        = "prm-apigw-setup-deploy-${var.environment}"
   description = "Deploy the APIGW Lambdas"
 
   source {

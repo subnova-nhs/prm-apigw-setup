@@ -1,5 +1,5 @@
 resource "aws_codebuild_project" "terratest" {
-  name        = "prm-apigw-terratest-${var.environment}"
+  name        = "prm-apigw-setup-terratest-${var.environment}"
   description = "Test the APIGW Deploys"
 
   source {

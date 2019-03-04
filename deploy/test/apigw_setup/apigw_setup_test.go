@@ -54,8 +54,8 @@ func TestApiGatewaySetup(t *testing.T) {
 		},
 
 		BackendConfig: map[string]interface{}{
-			"bucket": "prm-" + accountID + "-test-state",
-			"key":    environmentName + ".tfstate",
+			"bucket": "prm-" + accountID + "-terraform-states",
+			"key":    environmentName + "/terratest/apigw_setup/terraform.tfstate",
 			"region": "eu-west-2",
 		},
 
