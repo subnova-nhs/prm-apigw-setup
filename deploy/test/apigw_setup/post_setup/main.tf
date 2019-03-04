@@ -47,7 +47,7 @@ resource "aws_api_gateway_integration_response" "api_gw_integration" {
 # Deploy the endpoint
 
 module "apigw_deploy" {
-  source = "git@github.com:subnova-nhs/apigw-deploy.git/deploy/src//modules/apigw_deploy"
+  source = "github.com/subnova-nhs/prm-apigw-deploy/deploy/src//modules/apigw_deploy"
 
   aws_region = "${var.aws_region}"
   environment = "${var.environment}"
