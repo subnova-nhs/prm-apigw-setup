@@ -1,6 +1,10 @@
 resource "aws_s3_bucket" "artifacts" {
   bucket = "prm-${data.aws_caller_identity.current.account_id}-apigw-setup-pipeline-artifacts-${var.environment}"
   acl    = "private"
+
+  versioning {
+    enabled = true
+  }
 }
 
 # Role to use for running pipeline
@@ -30,7 +34,6 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:PutObjectAcl",
-      "s3:*"
     ]
 
     resources = ["${aws_s3_bucket.artifacts.arn}/*"]
@@ -42,7 +45,6 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
     actions = [
       "s3:ListBucket",
       "s3:GetBucketVersioning",
-      "s3:*"
     ]
 
     resources = ["${aws_s3_bucket.artifacts.arn}"]
@@ -108,7 +110,7 @@ resource "aws_codepipeline" "pipeline" {
 
     action {
       name            = "terratest"
-      category        = "Build"
+      category        = "Test"
       owner           = "AWS"
       provider        = "CodeBuild"
       version         = "1"
@@ -155,7 +157,7 @@ resource "aws_codepipeline" "pipeline" {
       configuration {
         BucketName = "${aws_s3_bucket.artifacts.bucket}"
         Extract = "true"
-        ObjectKey = "prm-apigw-setup-dale/outputs"
+        ObjectKey = "prm-apigw-setup-${var.environment}/outputs"
       }
     }
   }
