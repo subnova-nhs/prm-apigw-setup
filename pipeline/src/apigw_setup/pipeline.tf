@@ -30,6 +30,7 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
       "s3:GetObject",
       "s3:PutObject",
       "s3:PutObjectAcl",
+      "s3:*"
     ]
 
     resources = ["${aws_s3_bucket.artifacts.arn}/*"]
@@ -41,6 +42,7 @@ data "aws_iam_policy_document" "pipeline_role_policy" {
     actions = [
       "s3:ListBucket",
       "s3:GetBucketVersioning",
+      "s3:*"
     ]
 
     resources = ["${aws_s3_bucket.artifacts.arn}"]
@@ -130,10 +132,30 @@ resource "aws_codepipeline" "pipeline" {
       provider        = "CodeBuild"
       version         = "1"
       input_artifacts = ["source"]
+      output_artifacts = ["terraform"]
 
       configuration {
         ProjectName = "${aws_codebuild_project.deploy.name}"
         PrimarySource = "source"
+      }
+    }
+  }
+
+  stage {
+    name = "notify"
+
+    action {
+      name = "notify"
+      category = "Deploy"
+      owner = "AWS"
+      provider = "S3"
+      version = "1"
+      input_artifacts = ["terraform"]
+
+      configuration {
+        BucketName = "${aws_s3_bucket.artifacts.bucket}"
+        Extract = "true"
+        ObjectKey = "prm-apigw-setup-dale/outputs"
       }
     }
   }
